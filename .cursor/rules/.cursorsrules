@@ -1,0 +1,55 @@
+# .cursorsrules
+# This file defines the coding standards and guidelines for the Code Vulnerability Analyzer project.
+
+######################################
+# 1. Clean Code Principles
+######################################
+# - DRY: Do not repeat code. Refactor duplicated logic into functions or modules.
+# - KISS: Keep code simple and straightforward.
+# - SoC: Separate different concerns into distinct layers or modules.
+# - SOLID: Adhere to the principles of single responsibility, open/closed, Liskov substitution,
+#   interface segregation, and dependency inversion where applicable.
+
+######################################
+# 2. Naming Conventions
+######################################
+# - Use descriptive, intention-revealing names.
+# - For JavaScript/TypeScript, prefer camelCase for variables and functions.
+# - For Python, use snake_case as per PEP 8.
+# - Use consistent vocabulary across the project.
+
+######################################
+# 3. Code Formatting & Style
+######################################
+# - For Python: Follow PEP 8 guidelines (indentation, line length, whitespaces).
+# - For JavaScript/TypeScript: Use ESLint rules and Prettier integration to enforce style.
+# - Limit lines to 79 characters for Python and about 100 characters for JS/TS.
+# - Ensure proper file organization and module separation.
+
+######################################
+# 4. Documentation & Comments
+######################################
+# - Write clear comments where necessary.
+# - Avoid redundant or noisy comments.
+# - Prefer self-documenting code; refactor code that requires extensive commenting.
+
+######################################
+# 5. Testing & Code Quality
+######################################
+# - Add unit tests for all significant functions or components.
+# - Ensure changes do not break existing functionality.
+# - Run code linters and formatters before committing.
+
+######################################
+# 6. Security & Vulnerability Checks
+######################################
+# - Ensure that any new code adheres to security best practices.
+# - Do not hardcode secrets or credentials; use environment variables.
+# - Review any third-party code or dependencies for vulnerabilities.
+
+######################################
+# 7. Version Control Practices
+######################################
+# - Write clear and concise commit messages.
+# - Use branches for new features and hotfixes.
+# - Perform code reviews before merging into the main branch. 
