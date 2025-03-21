@@ -4,9 +4,40 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
-    <script type="module" crossorigin src="/CodeSafe/assets/index-HqeUmJgD.js"></script>
-    <link rel="stylesheet" crossorigin href="/CodeSafe/assets/index-ClO03Ggx.css">
+    <base href="%PUBLIC_URL%/">
+    <title>Code Vulnerability Analyzer</title>
+    <!-- GitHub Pages SPA redirect handling -->
+    <script type="text/javascript">
+      // Single Page Apps for GitHub Pages
+      // This script checks to see if a redirect is present in the query string,
+      // and if it is, replaces the current page with the intended path
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) { 
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+            l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+
+        // If ?path= parameter exists, use it to reconstruct the URL
+        if (l.search.includes('path=')) {
+          var path = new URLSearchParams(l.search).get('path');
+          if (path) {
+            var cleanSearch = l.search.replace(/(\?|&)path=[^&]*(&|$)/, '$1').replace(/&$/, '');
+            var newUrl = l.origin + 
+              (l.pathname.includes('/CodeSafe') ? '/CodeSafe/' : '/') + 
+              path + 
+              (cleanSearch !== '?' ? cleanSearch : '') + 
+              l.hash;
+            window.history.replaceState(null, null, newUrl);
+          }
+        }
+      }(window.location))
+    </script>
+    <script type="module" crossorigin src="/CodeSafe/assets/main-_MH5iuC8.js"></script>
+    <link rel="stylesheet" crossorigin href="/CodeSafe/assets/main-ClO03Ggx.css">
   </head>
   <body>
     <div id="root"></div>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+  <script>
+    // Enhanced script to handle authentication redirects from Supabase
+    
+    // Parse the URL and check for authentication tokens
+    var l = window.location;
+    var url = new URL(window.location.href);
+    
+    // Check if this is an authentication callback (has access_token or other auth params)
+    var isAuthCallback = url.hash.includes('access_token') || 
+                         url.hash.includes('refresh_token') || 
+                         url.hash.includes('type=signup') || 
+                         url.hash.includes('type=recovery');
+    
+    // Build redirect URL
+    var redirectUrl;
+    
+    if (isAuthCallback) {
+      // If this is an auth callback, redirect to the main app with the hash intact
+      redirectUrl = 'https://vyompandya.github.io/CodeSafe/' + url.hash;
+      console.log('Auth callback detected, redirecting to:', redirectUrl);
+    } else {
+      // For normal 404s, redirect to index
+      redirectUrl = 'https://vyompandya.github.io/CodeSafe/';
+      console.log('Regular 404, redirecting to home:', redirectUrl);
+    }
+    
+    // Redirect
+    window.location.replace(redirectUrl);
+  </script>
+</head>
+<body>
+  <h1>Redirecting...</h1>
+  <p>If you are not redirected automatically, <a href="https://vyompandya.github.io/CodeSafe/">click here</a>.</p>
+  
+  <script>
+    // Add a timeout fallback
+    setTimeout(function() {
+      window.location.href = 'https://vyompandya.github.io/CodeSafe/';
+    }, 5000);
+  </script>
+</body>
+</html> 
