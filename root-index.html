@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting to CodeSafe</title>
+  <script>
+    // This page redirects from the root GitHub Pages domain to the CodeSafe app
+    
+    // Get the current URL with hash parameters
+    var url = new URL(window.location.href);
+    var hash = window.location.hash;
+    var query = window.location.search;
+    
+    // Check if this is an authentication callback
+    if (hash && (hash.includes('access_token') || hash.includes('type=signup'))) {
+      // Redirect to the CodeSafe app with the authentication parameters
+      window.location.replace('https://vyompandya.github.io/CodeSafe/' + hash);
+      console.log('Auth callback detected, redirecting to CodeSafe with hash');
+    } else if (query && (query.includes('code=') || query.includes('token='))) {
+      // Handle query parameter auth redirects
+      window.location.replace('https://vyompandya.github.io/CodeSafe/' + query);
+      console.log('Auth callback detected with query params, redirecting to CodeSafe');
+    } else {
+      // If it's not an auth callback, just go to the app
+      window.location.replace('https://vyompandya.github.io/CodeSafe/');
+      console.log('Regular visit, redirecting to CodeSafe app');
+    }
+  </script>
+  <!-- Immediate redirect meta tag as a fallback -->
+  <meta http-equiv="refresh" content="2;url=https://vyompandya.github.io/CodeSafe/" />
+</head>
+<body>
+  <h1>Redirecting to CodeSafe...</h1>
+  <p>You are being redirected to the Code Vulnerability Analyzer. If not redirected automatically, 
+    <a href="https://vyompandya.github.io/CodeSafe/">click here</a>.</p>
+</body>
+</html> 
