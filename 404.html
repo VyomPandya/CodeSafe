@@ -1,64 +1,22 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Code Vulnerability Analyzer</title>
-    <!-- GitHub Pages SPA redirect handling -->
-    <script type="text/javascript">
-      // Single Page Apps for GitHub Pages
-      // This script checks to see if a redirect is present in the query string,
-      // and if it is, replaces the current page with the intended path
-      (function(l) {
-        if (l.search[1] === '/' ) {
-          var decoded = l.search.slice(1).split('&').map(function(s) { 
-            return s.replace(/~and~/g, '&')
-          }).join('?');
-          window.history.replaceState(null, null,
-            l.pathname.slice(0, -1) + decoded + l.hash
-          );
-        }
-
-        // If ?path= parameter exists, use it to reconstruct the URL
-        if (l.search.includes('path=')) {
-          var path = new URLSearchParams(l.search).get('path');
-          if (path) {
-            var cleanSearch = l.search.replace(/(\?|&)path=[^&]*(&|$)/, '$1').replace(/&$/, '');
-            var newUrl = l.origin + 
-              (l.pathname.includes('/CodeSafe') ? '/CodeSafe/' : '/') + 
-              path + 
-              (cleanSearch !== '?' ? cleanSearch : '') + 
-              l.hash;
-            window.history.replaceState(null, null, newUrl);
-          }
-        }
-      }(window.location))
-    </script>
-    
-    <!-- Environment variables for GitHub Pages deployment -->
-    <script>
-      // Initialize window._env_ object for environment variables
-      window._env_ = window._env_ || {};
-
-      // Determine the base path for the application
-      var basePath = '/';
-      if (window.location.pathname.includes('/CodeSafe')) {
-        basePath = '/CodeSafe/';
-      }
-      
-      // Dynamically load env-config.js with the correct path
-      var script = document.createElement('script');
-      script.src = basePath + 'env-config.js';
-      script.onerror = function() {
-        console.warn('Could not load env-config.js, falling back to environment variables');
-      };
-      document.head.appendChild(script);
-    </script>
-    <script type="module" crossorigin src="/CodeSafe/assets/main-hn1S9Vgc.js"></script>
-    <link rel="stylesheet" crossorigin href="/CodeSafe/assets/main-DH7LX523.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting...</title>
+  <script src="/CodeSafe/env-config.js"></script>
+  <script src="/CodeSafe/redirect.js"></script>
+  <script>
+    // Fallback redirect if the redirect.js script doesn't work
+    setTimeout(function() {
+      window.location.replace(window.location.origin + '/CodeSafe/');
+    }, 3000);
+  </script>
+</head>
+<body>
+  <div style="text-align:center; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <h1>Redirecting...</h1>
+    <p>If you are not redirected automatically, please <a href="/CodeSafe/">click here</a>.</p>
+  </div>
+</body>
 </html>

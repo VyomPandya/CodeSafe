@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Environment Variables Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .status {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 4px;
+    }
+    .success {
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+    .error {
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+    .warning {
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+      color: #856404;
+    }
+    pre {
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0069d9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Environment Variables Test</h1>
+  <p>This page tests whether your environment variables are correctly loaded.</p>
+  
+  <div id="loading">Loading environment variables...</div>
+  
+  <div id="results" style="display: none;">
+    <h2>Environment Variables Status</h2>
+    <div id="env-status"></div>
+    
+    <h2>Available Objects</h2>
+    <div id="window-objects"></div>
+    
+    <h2>Current URL</h2>
+    <pre id="current-url"></pre>
+    
+    <h2>Authentication Parameters</h2>
+    <div id="auth-params"></div>
+    
+    <h2>Supabase Environment Debug</h2>
+    <div id="supabase-debug">
+      <p>This section will show the __SUPABASE_ENV_DEBUG__ object if available.</p>
+      <pre id="supabase-debug-output">Loading...</pre>
+    </div>
+  </div>
+
+  <script src="/env-config.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const loading = document.getElementById('loading');
+      const results = document.getElementById('results');
+      const envStatus = document.getElementById('env-status');
+      const windowObjects = document.getElementById('window-objects');
+      const currentUrl = document.getElementById('current-url');
+      const authParams = document.getElementById('auth-params');
+      const supabaseDebugOutput = document.getElementById('supabase-debug-output');
+      
+      // Check for Supabase debug object
+      function checkSupabaseDebug() {
+        if (typeof window.__SUPABASE_ENV_DEBUG__ !== 'undefined') {
+          supabaseDebugOutput.textContent = JSON.stringify(window.__SUPABASE_ENV_DEBUG__, null, 2);
+        } else {
+          supabaseDebugOutput.textContent = 'The __SUPABASE_ENV_DEBUG__ object is not available. Make sure to load the app once to initialize this object.';
+        }
+      }
+      
+      // Small delay to ensure env-config.js is loaded
+      setTimeout(() => {
+        loading.style.display = 'none';
+        results.style.display = 'block';
+        
+        // Check if window._env_ exists
+        if (typeof window._env_ === 'undefined') {
+          addStatus(envStatus, 'error', 'window._env_ is not defined. Make sure env-config.js is loaded correctly.');
+        } else {
+          addStatus(envStatus, 'success', 'window._env_ is defined.');
+          
+          // Check specific environment variables
+          checkEnvVar('SUPABASE_URL');
+          checkEnvVar('SUPABASE_ANON_KEY');
+          checkEnvVar('OPENROUTER_API_KEY');
+        }
+        
+        // Show what objects are available on window
+        const keys = Object.keys(window).filter(key => 
+          key === '_env_' || 
+          key.includes('VITE_') || 
+          key.includes('ENV_') || 
+          key.includes('SUPABASE')
+        );
+        
+        if (keys.length > 0) {
+          addStatus(windowObjects, 'success', 'Found potential environment-related objects:');
+          const pre = document.createElement('pre');
+          pre.textContent = keys.join('\n');
+          windowObjects.appendChild(pre);
+        } else {
+          addStatus(windowObjects, 'warning', 'No environment-related objects found on window.');
+        }
+        
+        // Show current URL
+        currentUrl.textContent = window.location.href;
+        
+        // Check for auth parameters in URL
+        const hash = window.location.hash;
+        if (hash.includes('access_token') || 
+            hash.includes('refresh_token') || 
+            hash.includes('type=recovery') || 
+            hash.includes('type=signup')) {
+          addStatus(authParams, 'success', 'Authentication parameters found in URL.');
+          const safeHash = hash.replace(/access_token=[^&]+/, 'access_token=[REDACTED]')
+                             .replace(/refresh_token=[^&]+/, 'refresh_token=[REDACTED]');
+          const pre = document.createElement('pre');
+          pre.textContent = safeHash;
+          authParams.appendChild(pre);
+        } else {
+          addStatus(authParams, 'warning', 'No authentication parameters found in URL.');
+        }
+        
+        // Check Supabase debug object
+        checkSupabaseDebug();
+      }, 500);
+      
+      function checkEnvVar(name) {
+        if (window._env_ && window._env_[name]) {
+          // Don't show the actual value for sensitive keys
+          const isSensitive = name.includes('KEY') || name.includes('URL');
+          const value = isSensitive 
+            ? `[REDACTED] (${window._env_[name].length} characters)` 
+            : window._env_[name];
+            
+          if (window._env_[name].trim() === '') {
+            addStatus(envStatus, 'error', `${name} is defined but empty.`);
+          } else if (window._env_[name] === '${' + name + '}') {
+            addStatus(envStatus, 'error', `${name} contains template literal '${window._env_[name]}' instead of actual value.`);
+          } else {
+            addStatus(envStatus, 'success', `${name} is defined with value: ${value}`);
+          }
+        } else {
+          addStatus(envStatus, 'error', `${name} is not defined.`);
+        }
+      }
+      
+      function addStatus(container, type, message) {
+        const div = document.createElement('div');
+        div.className = `status ${type}`;
+        div.textContent = message;
+        container.appendChild(div);
+      }
+    });
+  </script>
+</body>
+</html> 
