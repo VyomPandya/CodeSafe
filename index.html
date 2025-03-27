@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="%PUBLIC_URL%/">
     <title>Code Vulnerability Analyzer</title>
     <!-- GitHub Pages SPA redirect handling -->
     <script type="text/javascript">
@@ -41,9 +40,22 @@
     <script>
       // Initialize window._env_ object for environment variables
       window._env_ = window._env_ || {};
-      // This will be populated by Vite during build time if available
+
+      // Determine the base path for the application
+      var basePath = '/';
+      if (window.location.pathname.includes('/CodeSafe')) {
+        basePath = '/CodeSafe/';
+      }
+      
+      // Dynamically load env-config.js with the correct path
+      var script = document.createElement('script');
+      script.src = basePath + 'env-config.js';
+      script.onerror = function() {
+        console.warn('Could not load env-config.js, falling back to environment variables');
+      };
+      document.head.appendChild(script);
     </script>
-    <script type="module" crossorigin src="/CodeSafe/assets/main-Bh5Su6Nd.js"></script>
+    <script type="module" crossorigin src="/CodeSafe/assets/main-hn1S9Vgc.js"></script>
     <link rel="stylesheet" crossorigin href="/CodeSafe/assets/main-DH7LX523.css">
   </head>
   <body>
