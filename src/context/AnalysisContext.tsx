@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { getSupabaseClient } from '../lib/supabase';
 import { VulnerabilityResult } from '../components/AnalysisResult';
@@ -175,7 +175,20 @@ function AnalysisProvider({ children }: { children: React.ReactNode }) {
   // Function to handle file upload and analysis
   const handleFileUpload = async (file: File) => {
     // Import here to avoid circular dependencies
-    const { analyzeCode } = await import('../lib/analyzer');
+    // Use a more reliable import approach for production builds
+    let analyzeCodeFunc;
+    try {
+      const module = await import('../lib/analyzer');
+      analyzeCodeFunc = module.analyzeCode;
+    } catch (importError) {
+      console.error("Failed to import analyzer module:", importError);
+      dispatch({ 
+        type: 'SET_ERROR', 
+        payload: 'Failed to load analysis module. Please refresh the page and try again.' 
+      });
+      dispatch({ type: 'SET_ANALYZING', payload: false });
+      return;
+    }
     
     try {
       // Reset previous analysis results first
@@ -195,7 +208,7 @@ function AnalysisProvider({ children }: { children: React.ReactNode }) {
       const fileObject = new File([fileBlob], file.name, { type: file.type });
       
       // Analyze code
-      const analysisResults = await analyzeCode(fileObject, state.selectedModel);
+      const analysisResults = await analyzeCodeFunc(fileObject, state.selectedModel);
       dispatch({ type: 'SET_RESULTS', payload: analysisResults });
 
       // Save to analysis history if user is logged in

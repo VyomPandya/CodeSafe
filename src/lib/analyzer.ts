@@ -1,6 +1,17 @@
 import { VulnerabilityResult } from '../components/AnalysisResult';
 import { getApiKey } from '../services/aiService';
 
+// Make sure the window._env_ type is properly defined
+declare global {
+  interface Window {
+    _env_?: {
+      SUPABASE_URL?: string;
+      SUPABASE_ANON_KEY?: string;
+      OPENROUTER_API_KEY?: string;
+    };
+  }
+}
+
 // Get the API key using the centralized function
 const getOpenRouterApiKey = () => {
   return getApiKey();
