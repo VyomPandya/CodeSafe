@@ -25,15 +25,6 @@ if (import.meta.env.DEV) {
   } else {
     console.warn('OpenRouter API key not found in environment variables');
   }
-  
-  // Also check window._env_
-  if (typeof window !== 'undefined' && window._env_) {
-    console.log('Checking window._env_ for OpenRouter API key:');
-    console.log('OPENROUTER_API_KEY exists:', window._env_.OPENROUTER_API_KEY ? 'Yes' : 'No');
-    if (window._env_.OPENROUTER_API_KEY) {
-      console.log(`window._env_.OPENROUTER_API_KEY starts with: ${window._env_.OPENROUTER_API_KEY.substring(0, 5)}...`);
-    }
-  }
 }
 
 // Log a warning if API key is missing, but don't treat it as a hard error
