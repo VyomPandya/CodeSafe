@@ -16,7 +16,7 @@ app.post('/api/openrouter', async (req, res) => {
   }
   try {
     const { code, ...options } = req.body;
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const response = await fetch('https://codesafe-openrouter-proxy-vyom-pandyas-projects.vercel.app/api/openrouter', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
