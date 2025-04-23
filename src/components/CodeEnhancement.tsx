@@ -42,7 +42,7 @@ Do not include any explanations outside the code block, just return the enhanced
 `;
 
       // Call the AI API (OpenRouter in this case)
-      const response = await fetch('https://codesafe-openrouter-proxy-vyom-pandyas-projects.vercel.app/api/openrouter', {
+      const response = await fetch('https://codesafe-openrouter-proxy-vyom-pandyas-projects.vercel.app/openrouter', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

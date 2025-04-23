@@ -17,7 +17,7 @@ export const initializeAiClient = () => ({ apiKey: '' });
  * @param options Additional options for the enhancement
  */
 export const enhanceCode = async (code: string, options = {}) => {
-  const response = await fetch('https://codesafe-openrouter-proxy-vyom-pandyas-projects.vercel.app/api/openrouter', {
+  const response = await fetch('https://codesafe-openrouter-proxy-vyom-pandyas-projects.vercel.app/openrouter', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
