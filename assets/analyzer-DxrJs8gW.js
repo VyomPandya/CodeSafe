@@ -1,4 +1,4 @@
-const m="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";async function g(e,a="mistralai/mistral-7b-instruct-v0.2:free"){var l,s;const u=await e.text(),n=(l=e.name.split(".").pop())==null?void 0:l.toLowerCase();console.log(`Analyzing code using model: ${a}`);try{const i=`
+const m="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";async function g(e,a="mistralai/mistral-7b-instruct-v0.2:free"){var l,s;const u=await e.text(),n=(l=e.name.split(".").pop())==null?void 0:l.toLowerCase();console.log(`Analyzing code using model: ${a}`);try{const i=`
 You are a code security expert analyzing code for vulnerabilities.
 Analyze this ${n} code and identify security issues:
 
