@@ -1,5 +1,4 @@
 import { VulnerabilityResult } from '../components/AnalysisResult';
-import { getApiKey } from '../services/aiService';
 
 // Make sure the window._env_ type is properly defined
 declare global {
@@ -11,23 +10,8 @@ declare global {
   }
 }
 
-// Get the API key using the centralized function
-const getOpenRouterApiKey = () => {
-  return getApiKey();
-};
-
-// Log more detailed API key info in development mode only
-if (import.meta.env.DEV) {
-  const apiKey = getOpenRouterApiKey();
-  if (apiKey) {
-    console.log(`OpenRouter API key found (starts with: ${apiKey.substring(0, 5)}...)`);
-  } else {
-    console.log('No OpenRouter API key found');
-  }
-}
-
 /**
- * This function sends code to OpenRouter API for vulnerability analysis
+ * This function sends code to the backend proxy for vulnerability analysis
  * @param file The uploaded code file
  * @param model The OpenRouter AI model to use for analysis
  * @returns Promise with vulnerability analysis results
@@ -35,161 +19,26 @@ if (import.meta.env.DEV) {
 export async function analyzeCode(file: File, model = 'nvidia/llama-3.1-nemotron-nano-8b-v1:free'): Promise<VulnerabilityResult[]> {
   const content = await file.text();
   const fileExtension = file.name.split('.').pop()?.toLowerCase();
-  
-  console.log(`Analyzing code using model: ${model}`);
-  
+
   try {
-    // Prepare the optimized prompt for the code analysis model
-    const prompt = `
-You are a code security expert analyzing code for vulnerabilities.
-Analyze this ${fileExtension} code and identify security issues:
-
-\`\`\`${fileExtension}
-${content}
-\`\`\`
-
-Your task is to return ONLY a JSON array of objects with these exact properties:
-- severity: Must be exactly one of "high", "medium", or "low"
-- message: A brief description of the vulnerability
-- line: The line number where the issue occurs (as a number)
-- rule: A short identifier for the type of vulnerability
-- improvement: Specific actionable advice to fix the issue
-
-Focus on:
-- Security vulnerabilities (XSS, injections, etc.)
-- Unsafe practices (eval, exec, etc.)
-- Hardcoded credentials
-- Input validation issues
-- Insecure API usage patterns
-
-IMPORTANT: 
-1. Return valid JSON and nothing else
-2. No explanations, markdown formatting, or any text before or after the JSON
-3. The JSON array should look like this:
-[
-  {
-    "severity": "high",
-    "message": "Use of eval() can lead to code injection",
-    "line": 42,
-    "rule": "no-eval",
-    "improvement": "Replace eval() with safer alternatives"
-  },
-  {
-    "severity": "medium",
-    "message": "Unvalidated user input",
-    "line": 27,
-    "rule": "validate-input",
-    "improvement": "Add input validation before processing"
-  }
-]
-`;
-
-    // Call OpenRouter API
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const response = await fetch('https://codesafe-openrouter-proxy-vyom-pandyas-projects.vercel.app/api/openrouter', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getOpenRouterApiKey()}`,
-        'HTTP-Referer': window.location.origin, // Required by OpenRouter
-        'X-Title': 'Code Vulnerability Analyzer', // Helpful for tracking in OpenRouter
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: model, // Use the provided model parameter
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.1, // Lower temperature for more precise code analysis
-        max_tokens: 2048, // Limit response size
+        code: content,
+        model,
+        fileExtension,
+        filename: file.name,
       }),
     });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('OpenRouter API error details:', errorData);
-      console.error('OpenRouter API error status:', response.status, response.statusText);
-      
-      // Log full details in development only
-      if (import.meta.env.DEV) {
-        console.error('OpenRouter API request headers:', {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer [REDACTED]', // Never log API key even partially
-          'HTTP-Referer': window.location.origin,
-          'X-Title': 'Code Vulnerability Analyzer'
-        });
-        console.error('OpenRouter API request URL:', 'https://openrouter.ai/api/v1/chat/completions');
-      }
-      
-      // Instead of throwing errors, log a warning and fall back to local analysis
-      if (response.status === 429) {
-        console.warn('Rate limit reached for free model. Falling back to local analysis.');
-      } else if (response.status === 401) {
-        console.warn('OpenRouter API authentication failed. Check if your API key is valid and correctly configured. Falling back to local analysis.');
-      } else {
-        console.warn(`OpenRouter API error: ${errorData.error?.message || response.statusText}. Falling back to local analysis.`);
-      }
-      
-      // Use local analysis as fallback
-      return performLocalAnalysis(content, fileExtension || '', file.name);
-    }
-
+    if (!response.ok) throw new Error('Proxy error: ' + response.status);
+    // If your proxy returns a structure like { choices: [{ message: { content: ... } }] }, parse accordingly
     const data = await response.json();
-    const aiResponse = data.choices[0].message.content;
-    
-    // Parse JSON from response
-    try {
-      let analysisResults: VulnerabilityResult[] = [];
-      
-      // First, try to parse the entire response as JSON
-      try {
-        analysisResults = JSON.parse(aiResponse) as VulnerabilityResult[];
-      } catch (parseError) {
-        // If that fails, try to extract JSON array using regex
-        const jsonMatch = aiResponse.match(/\[\s*\{.*\}\s*\]/s);
-        if (jsonMatch) {
-          analysisResults = JSON.parse(jsonMatch[0]) as VulnerabilityResult[];
-        } else {
-          // If no valid JSON array is found, try to see if there's any JSON-like content
-          console.log("AI response:", aiResponse);
-          throw new Error('Could not parse analysis results from AI response');
-        }
-      }
-      
-      // Validate the structure of the results
-      if (!Array.isArray(analysisResults)) {
-        throw new Error('AI response did not contain valid analysis results array');
-      }
-      
-      // Empty array is valid - it means no issues were found
-      if (analysisResults.length === 0) {
-        console.log('No vulnerabilities found in the code');
-        return [];
-      }
-      
-      // Verify that the results have the required properties
-      const hasRequiredProps = analysisResults.every(result => 
-        result.severity && result.message && 
-        (typeof result.line === 'number' || typeof result.line === 'string')
-      );
-      
-      if (!hasRequiredProps) {
-        throw new Error('Analysis results missing required properties');
-      }
-      
-      // Add line numbers if missing and ensure they are numbers
-      return analysisResults.map(result => ({
-        ...result,
-        line: typeof result.line === 'string' ? parseInt(result.line, 10) || 1 : result.line || 1,
-      }));
-    } catch (parseError: unknown) {
-      console.error('Error parsing AI response:', parseError);
-      console.log('Raw AI response:', aiResponse);
-      console.warn('Could not parse analysis results from AI response. Falling back to local analysis.');
-      
-      // Use local analysis as fallback for parse errors too
-      return performLocalAnalysis(content, fileExtension || '', file.name);
-    }
+    // You may need to adapt this if your backend returns a different structure
+    return data.choices?.[0]?.message?.content || data;
   } catch (error) {
-    console.error('Error analyzing code with AI:', error);
-    // Fall back to local analysis on any error
-    return performLocalAnalysis(content, fileExtension || '', file.name);
+    // Optionally: fallback to local analysis or rethrow
+    throw error;
   }
 }
 
