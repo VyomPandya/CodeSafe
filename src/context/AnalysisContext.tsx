@@ -146,7 +146,7 @@ interface AnalysisContextProps {
 const AnalysisContext = createContext<AnalysisContextProps | undefined>(undefined);
 
 // Provider component
-export function AnalysisProvider({ children }: { children: React.ReactNode }) {
+function AnalysisProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(analysisReducer, initialState);
   
   // Function to load analysis history
@@ -379,10 +379,12 @@ export function AnalysisProvider({ children }: { children: React.ReactNode }) {
 }
 
 // Custom hook to use the analysis context
-export const useAnalysis = () => {
+function useAnalysis() {
   const context = useContext(AnalysisContext);
   if (context === undefined) {
     throw new Error('useAnalysis must be used within an AnalysisProvider');
   }
   return context;
 }; 
+
+export { AnalysisProvider, useAnalysis };
