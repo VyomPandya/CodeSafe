@@ -5,14 +5,14 @@
  */
 export async function analyzeCode(code: string): Promise<string> {
   // 1. Retrieve the API key from environment variables
-  const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+  // const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY; // No longer used, handled by backend proxy
 
   // 2. Check if the API key is available
-  if (!apiKey) {
-    console.warn("OpenRouter API Key is missing. Please check environment variables or build configuration.");
-    // Use a more user-friendly error for missing configuration
-    throw new Error("OpenRouter integration is not properly configured. The application will use local analysis instead.");
-  }
+  // if (!apiKey) {
+  //   console.warn("OpenRouter API Key is missing. Please check environment variables or build configuration.");
+  //   // Use a more user-friendly error for missing configuration
+  //   throw new Error("OpenRouter integration is not properly configured. The application will use local analysis instead.");
+  // }
 
   const openRouterApiUrl = "https://openrouter.ai/api/v1/chat/completions";
   const siteUrl = window.location.origin; // Get the site URL for the Referer header
@@ -23,7 +23,7 @@ export async function analyzeCode(code: string): Promise<string> {
       method: "POST",
       headers: {
         // 3. Correctly format the Authorization header
-        "Authorization": `Bearer ${apiKey}`,
+        // "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
         // 4. Add recommended OpenRouter headers
         "HTTP-Referer": siteUrl,

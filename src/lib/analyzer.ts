@@ -7,7 +7,6 @@ declare global {
     _env_?: {
       SUPABASE_URL?: string;
       SUPABASE_ANON_KEY?: string;
-      OPENROUTER_API_KEY?: string;
     };
   }
 }

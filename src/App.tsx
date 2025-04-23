@@ -197,14 +197,6 @@ function AppContent() {
     }
   }, [state.error, state.isDevMode, dispatch]);
 
-  // Display a notification if the OpenRouter API key is missing
-  useEffect(() => {
-    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-    if (!apiKey) {
-      showToast('OpenRouter API key not configured. Local analysis will be used as fallback.', 'warning');
-    }
-  }, []);
-
   // When error state changes, show a toast
   useEffect(() => {
     if (state.error) {

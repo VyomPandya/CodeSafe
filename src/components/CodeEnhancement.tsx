@@ -23,16 +23,6 @@ export function CodeEnhancement({ fileName, originalCode }: CodeEnhancementProps
       setLoading(true);
       setError(null);
       
-      // Use environment variable API key instead of hardcoded value
-      const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-      
-      // Don't proceed if API key is missing
-      if (!apiKey) {
-        setError("API key not configured. Cannot generate enhanced code.");
-        setLoading(false);
-        return;
-      }
-
       // Prepare the prompt for code enhancement
       const prompt = `
 You are an expert code reviewer. Analyze this code and suggest improvements:
@@ -56,7 +46,6 @@ Do not include any explanations outside the code block, just return the enhanced
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
           'HTTP-Referer': window.location.origin,
           'X-Title': 'Code Vulnerability Analyzer',
         },
