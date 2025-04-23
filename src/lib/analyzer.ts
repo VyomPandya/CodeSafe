@@ -22,13 +22,8 @@ if (import.meta.env.DEV) {
   if (apiKey) {
     console.log(`OpenRouter API key found (starts with: ${apiKey.substring(0, 5)}...)`);
   } else {
-    console.warn('OpenRouter API key not found in environment variables');
+    console.log('No OpenRouter API key found');
   }
-}
-
-// Log a warning if API key is missing, but don't treat it as a hard error
-if (!getOpenRouterApiKey()) {
-  console.warn('OpenRouter API key not found, local analysis will be used as fallback');
 }
 
 /**
@@ -40,12 +35,6 @@ if (!getOpenRouterApiKey()) {
 export async function analyzeCode(file: File, model = 'nvidia/llama-3.1-nemotron-nano-8b-v1:free'): Promise<VulnerabilityResult[]> {
   const content = await file.text();
   const fileExtension = file.name.split('.').pop()?.toLowerCase();
-  
-  // Local fallback analysis if OpenRouter API key is not set
-  if (!getOpenRouterApiKey()) {
-    console.warn('OpenRouter API key not found, using local analysis');
-    return performLocalAnalysis(content, fileExtension || '', file.name);
-  }
   
   console.log(`Analyzing code using model: ${model}`);
   
