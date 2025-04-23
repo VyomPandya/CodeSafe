@@ -21,7 +21,7 @@ export async function analyzeCode(file: File, model = 'nvidia/llama-3.1-nemotron
   const fileExtension = file.name.split('.').pop()?.toLowerCase();
 
   try {
-    const response = await fetch('https://codesafe-openrouter-proxy-vyom-pandyas-projects.vercel.app/openrouter', {
+    const response = await fetch('https://codesafe-openrouter-proxy-vyom-pandyas-projects.vercel.app/api/openrouter', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

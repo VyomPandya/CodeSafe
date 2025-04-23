@@ -14,7 +14,7 @@ export async function analyzeCode(code: string): Promise<string> {
   //   throw new Error("OpenRouter integration is not properly configured. The application will use local analysis instead.");
   // }
 
-  const openRouterApiUrl = "https://codesafe-openrouter-proxy-vyom-pandyas-projects.vercel.app/openrouter";
+  const openRouterApiUrl = "https://codesafe-openrouter-proxy-vyom-pandyas-projects.vercel.app/api/openrouter";
   const siteUrl = window.location.origin; // Get the site URL for the Referer header
   const appName = "Code Vulnerability Analyzer"; // Set your app name for the X-Title header
 
